@@ -21,15 +21,33 @@ fn parse_input() -> Result<Vec<Vec<i32>>, Box<dyn std::error::Error>> {
 }
 
 fn find_visible(grid: Vec<Vec<i32>>) {
+    let mut nr_visible = 0;
+
+    nr_visible += (grid.len() * 2) + ((grid.len() - 2) * 2);
+
     for i in 1..grid.len() - 1 {
         for j in 1..grid.len() - 1 {
-            println!("---------");
-            println!("v={}", grid[i][j]);
-            println!("x={:?}", &grid[i][0..i]);
-            println!("x={:?}", &grid[i][i + 1..])
-            // take the max() for each direction, if its more than v, we its not visible
+            // figure out differnet trees in the each line
+            let left = &grid[i][0..j];
+            let right = &grid[i][j + 1..];
+            let up_down: &Vec<i32> = &grid.iter().map(|x| x[j]).collect();
+            let up = &up_down[0..i];
+            let down = &up_down[i + 1..];
+
+            let lines_of_sight = vec![&left, &right, &up, &down];
+
+            // loop over lines and find lines where the tallest tree
+            // in a line is smaller than the target tree
+            for line in lines_of_sight {
+                if line.iter().max().unwrap() < &grid[i][j] {
+                    // println!("VISIBLE");
+                    nr_visible += 1;
+                    break;
+                }
+            }
         }
     }
+    println!("nr_visible={}", nr_visible);
 }
 
 fn main() {
